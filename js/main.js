@@ -1,55 +1,58 @@
 import { getTabuleiro } from "./state.js";
 
 const eTabuleiro = document.querySelector(".tabuleiro");
-const disco = document.querySelector(".disco");
 
+//const disco = document.querySelector(".disco");
 
 let arrastado = null;
 
 setup();
 
-function comecaArrastar(evento){
-    console.log(evento.target);
-    arrastado = evento.target;
-
+function comecaArrastar (evento){
+    arrastado=evento.target;
 }
 
-function recebeAlgo(evento){
+function recebeAlgo (evento){
     console.log(evento.target);
-    if(arrastado){
+    if(arrastado && evento.target.classList.contains('casa')){
         evento.target.appendChild(arrastado);
-        arrastado = null;
+        const posDisco = arrastado.dataset.posicao;
+        const posCasa = evento.target.dataset.posicao;
+        console.log(`moveu o disco de ${posDisco} para ${posCasa}`);
+        arrastado=null;
     }
 }
 
-function passouPorcima(evento){
+function passouPorCima (evento){
     evento.preventDefault();
-    //console.log(evento.target);
 }
 
 function setup(){
-    const tabuleiro = getTabuleiro();
-    for (let i = 0; i < tabuleiro.length; i++) {
+    const tabuleiro=getTabuleiro();
+    for(let i = 0; i <tabuleiro.length;i++){
         const casa = tabuleiro[i];
-        const eCasa = criaCasa(casa);
+        const eCasa = criaCasa(casa,i);
         eTabuleiro.appendChild(eCasa);
     }
 }
 
-function criaCasa(casa){
+function criaCasa(casa, k){
     const eCasa = document.createElement('div');
+    eCasa.dataset.posicao = k;
     eCasa.classList.add("casa");
-    eCasa.addEventListener('dragover', passouPorcima);
-    eCasa.addEventListener('drop', recebeAlgo);
+    eCasa.addEventListener('dragover',passouPorCima);
+    eCasa.addEventListener('drop',recebeAlgo);
     if(casa){
-        const eDisco = criaDisco(casa);
+        const eDisco = criaDisco(casa,k);
         eCasa.appendChild(eDisco);
     }
     return eCasa;
 }
 
-function criaDisco(casa){
-    const eDisco = document.createElement('div');
+function criaDisco(casa,k){
+    const eDisco=document.createElement('div');
+    eDisco.draggable=true;
+    eDisco.dataset.posicao=k;
     eDisco.classList.add('disco');
     eDisco.addEventListener('dragstart', comecaArrastar);
     if(casa === 'p'){
